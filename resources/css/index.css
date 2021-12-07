@@ -1,0 +1,342 @@
+/* 
+1. Universal Styles
+2. Page Styles
+3. Component & Section Styles
+*/
+
+/* ======= 1. Universal Styles ======= */
+
+:root {
+  /*Celcom Primary Colours*/
+  --celcom-blue: rgb(0, 155, 223);
+  --celcom-purple: rgb(121, 54, 128);
+
+  /* Celcom Secondary Colours */
+  --celcom-secondary-blue: rgb(22, 67, 150);
+  --celcom-secondary-red: rgb(196, 13, 66);
+  --celcom-secondary-gold: rgb(253, 185, 52);
+  --celcom-secondary-orange: rgb(247, 148, 30);
+  --celcom-secondary-red-orange: rgb(241, 90, 34);
+  --celcom-secondary-purple: rgb(123, 27, 103);
+  --celcom-secondary-magenta: rgb(238, 62, 128);
+
+  /*Celcom Neutral Palette*/
+  --celcom-neutral-white: rgb(255, 255, 255);
+  --celcom-neutral-5pct-black: rgb(243, 243, 243);
+  --celcom-neutral-10pct-black: rgb(230, 230, 230);
+  --celcom-neutral-20pct-black: rgb(204, 204, 204);
+  --celcom-neutral-40pct-black: rgb(153, 153, 153);
+  --celcom-neutral-60pct-black: rgb(102, 102, 102);
+  --celcom-neutral-80pct-black: rgb(51, 51, 51);
+
+  /*Celcom Gradient Colours */
+  --celcom-gradient-1: linear-gradient(90deg, rgb(121, 54, 128) 0%, rgb(0, 155, 223) 100%);
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: Lato;
+    width: 100vw;
+  }
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+  }
+
+/* ======= 2. Page Styles ======= */
+
+
+/* ======= 3. Component & Section Styles ======= */
+
+/* Navbar Section */
+#fixed-navbar {
+  position: fixed;
+  top: 0;
+  height: 3.8rem;
+  z-index: 100;
+  box-shadow: 0 0.125rem 0.25rem hsla(0, 0%, 60%, 0.75);
+}
+
+#navbar-first-row {
+  display: none;
+}
+
+#navbar-second-row {
+  width: 100vw;
+  height: 100%;
+  padding: 0.8rem;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: baseline;
+  background-color: white;
+}
+
+#logo_anchors-area {
+  width: auto;
+  height: 100%;
+}
+
+#logo-subarea {
+  width: auto;
+  height: 100%;
+}
+
+#logo-subarea img {
+  width: auto;
+  height: 100%;
+}
+
+#main-anchors-subarea {
+  display: none;
+}
+
+#search_cart_login-area {
+  height: 100%;
+}
+
+#search_cart-subarea {
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+#search_cart-subarea div {
+  height: 90%;
+}
+
+#search_cart-subarea div img {
+  width: auto;
+  height: 100%;
+}
+
+#login-subarea {
+  display: none;
+}
+
+.navbar-icon + .navbar-icon {
+  margin-left: 2.5vw;
+}
+
+@media only screen and (min-width: 800px) {
+  #fixed-navbar {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 6rem;
+  }
+
+  #navbar-first-row {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: end;
+    height: 37.5%;
+    width: 100vw;
+    background: var(--celcom-gradient-1);
+    padding: 0 .8rem;
+  }
+
+  #top-anchors-subarea {
+    margin-left: 68.34px;
+  }
+
+  #personal-business-anchors {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    padding-left: calc(2rem + 2vw);
+    margin: 0;
+    margin-left: 68.34px;
+  }
+
+  #personal-business-anchors li {
+    padding: 0 .8rem .4rem;
+    margin-bottom: -1px;
+    list-style: none;
+  }
+
+  #personal-business-anchors li a {
+    color: white;
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+
+  #top-anchor-personal {
+    border-bottom: 0.4rem solid white;
+  }
+
+  #top-anchor-business:hover {
+    border-bottom: 0.4rem solid var(--celcom-neutral-white);
+  }
+
+  #navbar-second-row {
+    width: 100vw;
+    height: 62.5%;
+    padding: 0.8rem;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: baseline;
+    background-color: white;
+  }
+  
+  #logo_anchors-area {
+    width: auto;
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+  
+  #logo-subarea {
+    width: auto;
+    height: 100%;
+    padding-left: 2vw;
+  }
+  
+  #logo-subarea img {
+    width: auto;
+    height: 100%;
+  }
+  
+  #main-anchors-subarea {
+    display: block;
+  }
+
+  #main-anchors {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+
+  .main-anchor + .main-anchor {
+    margin-left: 2vw;
+  }
+
+  #main-anchors li {
+    list-style: none;
+  }
+
+  #main-anchors li a {
+    color: black;
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  #main-anchors li a:hover {
+    color: var(--celcom-blue);
+    font-size: 1rem;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  #search_cart_login-area {
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items:stretch;
+    justify-content: flex-end;
+    margin-right: 2vw;
+  }
+  
+  #search_cart-subarea {
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+  }
+  
+  #search_cart-subarea div {
+    height: 90%;
+  }
+  
+  #search_cart-subarea div img {
+    width: auto;
+    height: 100%;
+  }
+
+  .navbar-icon + .navbar-icon {
+    margin-left: 0;
+  }
+
+  .navbar-icon {
+    margin: 0;
+    margin-right: 2vw;
+  }
+  
+  #login-subarea {
+    display: flex;
+    align-items: stretch;
+    margin-top: -3px;
+  }
+
+  #login-anchors {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 0;
+  }
+
+  #login-anchors li {
+    list-style: none;
+  }
+
+  #login-anchors li a {
+    text-decoration: none;
+    color: var(--celcom-blue);
+  }
+
+  #login-anchors li a:hover {
+    color: var(--celcom-secondary-gold)
+  }
+  
+  li.login-anchor + li.login-anchor::before {
+    content: " / ";
+    padding: 0 .3rem;
+  }
+
+  #navbar-icon-3 {
+    display: none;
+  }
+}
+
+/* Hero Banner Section */
+header#hero {
+width: 100vw;
+margin-top: 3.8rem;
+height: 60vh;
+background: var(--celcom-gradient-1);
+}
+
+@media only screen and (min-width: 800px) {
+  header#hero {
+    margin-top: 6rem;
+  }
+}
+
+#hero-carousel-banner {
+
+}
+
+/* Footer Section */
+footer#site-footer {
+  width: 100vw;
+  height: 80vh;
+  background: var(--celcom-gradient-1);
+}
+
+@media only screen and (min-width: 400px) {
+  footer#site-footer {
+    height: 70vh;
+  }
+}
+
+
+@media only screen and (min-width: 800px) {
+  footer#site-footer {
+    height: 60vh;
+  }
+}
