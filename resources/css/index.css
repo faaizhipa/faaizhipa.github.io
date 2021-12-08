@@ -38,6 +38,7 @@ html {
     font-size: 16px;
     font-family: Lato;
     width: 100vw;
+    overflow-x: hidden;
   }
 
 *,
@@ -96,6 +97,7 @@ html {
 
 #search_cart_login-area {
   height: 100%;
+  margin-right: 2vw;
 }
 
 #search_cart-subarea {
@@ -324,19 +326,53 @@ background: var(--celcom-gradient-1);
 /* Footer Section */
 footer#site-footer {
   width: 100vw;
+  background: var(--celcom-neutral-5pct-black);
+}
+
+#external-links {
   height: 80vh;
-  background: var(--celcom-gradient-1);
+  display: grid;
+  grid-template-rows: repeat(20, 1fr);
+}
+
+#about_support {
+  grid-row: 2 / 5;
+  background-color: var(--celcom-neutral-10pct-black);
+}
+
+#app-socmed_mcmc {
+  grid-row: 5 / 15;
+  background-color: var(--celcom-neutral-40pct-black);
+}
+
+#resources-copyright {
+  grid-row: 15 / 20;
+  background-color: var(--celcom-neutral-60pct-black);
 }
 
 @media only screen and (min-width: 400px) {
   footer#site-footer {
-    height: 70vh;
+    
   }
+}
+
+  #external-links {
+    height: 70vh;
+    display: grid;
+    grid-template-rows: repeat(20, 1fr);
 }
 
 
 @media only screen and (min-width: 800px) {
   footer#site-footer {
-    height: 60vh;
+    
   }
+
+  #external-links {
+    height: 60vh;
+    display: grid;
+    grid-template-rows: repeat(20, 1fr);
+  }
+
+
 }
