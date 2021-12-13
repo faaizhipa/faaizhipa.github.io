@@ -98,7 +98,7 @@ header .mobile {
   }
 
   header .content {
-    padding: .5rem 0;
+    padding: 1.5rem 0;
   }
 
   header .mobile ul {
@@ -467,4 +467,37 @@ footer .copyright {
   footer .content {
     font-size: .625rem;
   }
+}
+
+#back-button {
+  width: fit-content;
+  height: fit-content;
+  position: fixed;
+  z-index: 2000;
+  padding: 0 2rem;
+  background-color: rgb(211, 68, 12);
+  border-radius: .5rem;
+  top: 3rem;
+  margin-left: -0.5rem;
+  opacity: 0.6;
+}
+
+#back-button:hover {
+  opacity: 1;
+}
+
+#back-button a {
+  margin: auto 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+#back-button a p {
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 1rem;
 }

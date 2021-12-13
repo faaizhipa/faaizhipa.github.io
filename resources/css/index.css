@@ -339,6 +339,7 @@ footer#site-footer {
 }
 
 #external-links {
+  min-height: 525px;
   height: 80vh;
   max-height: 535px;
   display: grid;
@@ -539,6 +540,7 @@ a.anchor-mobile {
   }
 
   #external-links {
+    min-height: 343px;
     height: 60vh;
     max-height: 353px;
     display: grid;
