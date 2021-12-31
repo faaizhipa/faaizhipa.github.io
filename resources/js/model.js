@@ -3,7 +3,7 @@ let modelDiv = document.getElementById("canco-model");
 
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0x050505);
 
     camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 1, 5000);
     camera.rotation.y = 10/180*Math.PI;

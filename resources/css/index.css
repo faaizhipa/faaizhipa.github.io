@@ -40,6 +40,7 @@ html {
     font-family: Lato;
     width: 100vw;
     overflow-x: hidden;
+    background-color: #050505;
   }
 
 *,
@@ -318,12 +319,37 @@ header#hero {
 width: 100%;
 margin-top: 3.8rem;
 height: 70vh;
-background: var(--celcom-gradient-1);
+background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(5, 5, 5, 1)), url('../images/hero.png');
+background-position: 30% 25%;
+background-repeat: no-repeat;
+background-size: cover; 
+display: flex;
+align-items: baseline;
+}
+
+#hero-carousel-banner {
+  display: flex;
+  align-items: baseline;
+}
+
+#message {
+  font-size: 7vw;
+  color: var(--celcom-neutral-white);
+  padding-left: 10vw;
+  padding-top: 20vw;
 }
 
 @media only screen and (min-width: 800px) {
   header#hero {
     margin-top: 6rem;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(5, 5, 5, 0.8), rgba(5, 5, 5, 0.9), rgba(5, 5, 5, 1)), url('../images/hero.png');
+  }
+
+  #message {
+    font-size: 5vh;
+    color: var(--celcom-neutral-white);
+    padding-left: 5vw;
+    padding-top: 20vw;
   }
 }
 
@@ -349,6 +375,10 @@ footer#site-footer {
   width: 100vw;
   background: var(--celcom-neutral-70pct-black);
   padding: 0 5vw 0 3vw;
+}
+
+#cta-make-the-switch {
+  display: none;
 }
 
 #external-links {
