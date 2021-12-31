@@ -317,7 +317,7 @@ html {
 header#hero {
 width: 100%;
 margin-top: 3.8rem;
-height: 60vh;
+height: 70vh;
 background: var(--celcom-gradient-1);
 }
 
@@ -329,6 +329,19 @@ background: var(--celcom-gradient-1);
 
 #hero-carousel-banner {
 
+}
+
+/* Main Section */
+#featured-highlight {
+  display: none;
+}
+
+#carousel-why-celcom {
+  display: none;
+}
+
+#important-announcement {
+  display: none;
 }
 
 /* Footer Section */
