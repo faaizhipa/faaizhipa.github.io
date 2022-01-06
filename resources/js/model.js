@@ -1,4 +1,4 @@
-let scene, camera, renderer;
+let scene, camera, renderer, canco;
 let modelDiv = document.getElementById("canco-model");
 
 function init() {
@@ -44,16 +44,22 @@ function init() {
         canco = gltf.scene.children[0];
         canco.scale.set(0.6, 0.6, 0.6);
         scene.add(gltf.scene);
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            canco.rotation.y += 0.0065;
-            renderer.render(scene, camera);
-        };
-
-        animate();
-    
     });
 }
 
+function animate() {
+    requestAnimationFrame(animate);
+    canco.rotation.y += 0.0065;
+    renderer.render(scene, camera);
+};
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.addEventListener('resize', onWindowResize, false);
+
 init();
+animate();
