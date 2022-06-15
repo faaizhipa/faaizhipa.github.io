@@ -19,19 +19,19 @@ function init() {
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    light1 = new THREE.PointLight(0x040302, 70);
+    light1 = new THREE.PointLight(0x040302, 78);
     light1.position.set(0, 300, 500);
     scene.add(light1);
 
-    light2 = new THREE.PointLight(0x050202, 60);
+    light2 = new THREE.PointLight(0x050202, 70);
     light2.position.set(590, 100, 0);
     scene.add(light2);
 
-    light3 = new THREE.PointLight(0x020201, 50);
+    light3 = new THREE.PointLight(0x020201, 60);
     light3.position.set(0, 100, -500);
     scene.add(light3);
 
-    light4 = new THREE.PointLight(0x020201, 45);
+    light4 = new THREE.PointLight(0x020201, 55);
     light4.position.set(-500, 300, 0);
     scene.add(light4);
     
