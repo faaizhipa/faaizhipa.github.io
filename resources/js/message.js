@@ -739,9 +739,9 @@ function setupEnterprisePortal() {
 
     const passAssembler = document.getElementById("tp-pass-assembler");
     passAssembler.addEventListener("input", (e) => {
-        if (e.target.value === "933>>") {
+        if (e.target.value) {
             const finalPassword = `LyKb${e.target.value.slice(0, 4)}RRjc`;
-            copyTextToClipboard(finalPassword, "LyKb933>RRjc");
+            copyTextToClipboard(finalPassword, "skibidi");
             e.target.value = "";
             e.target.blur();
         }
