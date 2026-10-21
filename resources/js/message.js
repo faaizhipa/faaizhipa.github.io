@@ -1,8 +1,199 @@
-function getFormattedDateInfo() {
+// ============================================================================
+// 0. Configurable JAKIM Prayer Time Fetcher for Malaysia Zones
+// ============================================================================
+
+// Popular JAKIM Prayer Zones
+const JAKIM_ZONES = {
+    "PNG01": { name: "Penang (Pulau Pinang)", lat: 5.4164, lon: 100.3327 },
+    "WLP01": { name: "Kuala Lumpur / Putrajaya", lat: 3.1390, lon: 101.6869 },
+    "JHR01": { name: "Johor Bahru", lat: 1.4927, lon: 103.7414 },
+    "SGR01": { name: "Selangor (Shah Alam)", lat: 3.0738, lon: 101.5183 },
+    "PRK01": { name: "Perak (Ipoh)", lat: 4.5975, lon: 101.0901 },
+    "KDH01": { name: "Kedah (Alor Setar)", lat: 6.1248, lon: 100.3678 },
+    "PNG02": { name: "Balik Pulau / Seberang Perai", lat: 5.3533, lon: 100.2431 },
+    "SWK01": { name: "Sarawak (Kuching)", lat: 1.5533, lon: 110.3592 },
+    "SBH01": { name: "Sabah (Kota Kinabalu)", lat: 5.9804, lon: 116.0735 }
+};
+
+const DEFAULT_ZONE = "PNG01";
+
+function getSelectedZone() {
+    try {
+        const stored = localStorage.getItem("penang_jakim_selected_zone");
+        if (stored && JAKIM_ZONES[stored]) return stored;
+    } catch (_) {}
+    return DEFAULT_ZONE;
+}
+
+function setSelectedZone(zoneCode) {
+    try {
+        localStorage.setItem("penang_jakim_selected_zone", zoneCode);
+    } catch (_) {}
+}
+
+const FALLBACK_PRAYERS = [
+    { name: "Subuh", hour: 6, min: 0 },
+    { name: "Syuruk", hour: 7, min: 10 },
+    { name: "Zohor", hour: 13, min: 15 },
+    { name: "Asar", hour: 16, min: 30 },
+    { name: "Maghrib", hour: 19, min: 20 },
+    { name: "Isyak", hour: 20, min: 30 }
+];
+
+let cachedPrayers = null;
+let cachedPrayerKey = null;
+
+function parsePrayerTimeValue(val) {
+    if (typeof val === "number") {
+        const dt = new Date(val * 1000);
+        const parts = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Kuala_Lumpur",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23"
+        }).format(dt);
+        const [hour, min] = parts.split(":").map(Number);
+        return { hour, min };
+    }
+    if (typeof val === "string") {
+        const clean = val.trim().split(" ")[0];
+        const [hour, min] = clean.split(":").map(Number);
+        if (!Number.isNaN(hour) && !Number.isNaN(min)) {
+            return { hour, min };
+        }
+    }
+    return null;
+}
+
+async function getPrayerTimesForZone(zoneCode, now = new Date()) {
+    const mytParts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kuala_Lumpur",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(now);
+
+    const year = Number(mytParts.find(p => p.type === "year").value);
+    const month = Number(mytParts.find(p => p.type === "month").value);
+    const day = Number(mytParts.find(p => p.type === "day").value);
+    const cacheKey = `${zoneCode}_${year}-${month}-${day}`;
+
+    if (cachedPrayers && cachedPrayerKey === cacheKey) {
+        return cachedPrayers;
+    }
+
+    const storageKey = `jakim_prayers_${cacheKey}`;
+    try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length >= 5) {
+                cachedPrayers = parsed;
+                cachedPrayerKey = cacheKey;
+                return parsed;
+            }
+        }
+    } catch (_) {}
+
+    // Primary API: Waktu Solat v2 (Official JAKIM e-Solat mirror)
+    try {
+        const res = await fetch(`https://api.waktusolat.app/v2/solat/${zoneCode}?year=${year}&month=${month}`);
+        if (res.ok) {
+            const data = await res.json();
+            const todayEntry = Array.isArray(data.prayers)
+                ? data.prayers.find(p => Number(p.day) === day)
+                : null;
+
+            if (todayEntry) {
+                const mapping = [
+                    { name: "Subuh", raw: todayEntry.fajr },
+                    { name: "Syuruk", raw: todayEntry.syuruk },
+                    { name: "Zohor", raw: todayEntry.dhuhr },
+                    { name: "Asar", raw: todayEntry.asr },
+                    { name: "Maghrib", raw: todayEntry.maghrib },
+                    { name: "Isyak", raw: todayEntry.isha }
+                ];
+                const parsedList = mapping
+                    .map(item => {
+                        const hm = parsePrayerTimeValue(item.raw);
+                        return hm ? { name: item.name, hour: hm.hour, min: hm.min } : null;
+                    })
+                    .filter(Boolean);
+
+                if (parsedList.length >= 5) {
+                    cachedPrayers = parsedList;
+                    cachedPrayerKey = cacheKey;
+                    try { localStorage.setItem(storageKey, JSON.stringify(parsedList)); } catch (_) {}
+                    return parsedList;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("Primary JAKIM API unreachable, trying Aladhan fallback:", err);
+    }
+
+    // Secondary Fallback API: Aladhan (Method 17 = JAKIM)
+    try {
+        const zoneInfo = JAKIM_ZONES[zoneCode] || JAKIM_ZONES[DEFAULT_ZONE];
+        const ddMmYyyy = `${String(day).padStart(2, "0")}-${String(month).padStart(2, "0")}-${year}`;
+        const fallbackUrl = `https://api.aladhan.com/v1/timings/${ddMmYyyy}?latitude=${zoneInfo.lat}&longitude=${zoneInfo.lon}&method=17`;
+        const res = await fetch(fallbackUrl);
+        if (res.ok) {
+            const json = await res.json();
+            const t = json?.data?.timings;
+            if (t) {
+                const mapping = [
+                    { name: "Subuh", raw: t.Fajr },
+                    { name: "Syuruk", raw: t.Sunrise },
+                    { name: "Zohor", raw: t.Dhuhr },
+                    { name: "Asar", raw: t.Asr },
+                    { name: "Maghrib", raw: t.Maghrib },
+                    { name: "Isyak", raw: t.Isha }
+                ];
+                const parsedList = mapping
+                    .map(item => {
+                        const hm = parsePrayerTimeValue(item.raw);
+                        return hm ? { name: item.name, hour: hm.hour, min: hm.min } : null;
+                    })
+                    .filter(Boolean);
+
+                if (parsedList.length >= 5) {
+                    cachedPrayers = parsedList;
+                    cachedPrayerKey = cacheKey;
+                    try { localStorage.setItem(storageKey, JSON.stringify(parsedList)); } catch (_) {}
+                    return parsedList;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("Aladhan fallback API unreachable, using defaults:", err);
+    }
+
+    return FALLBACK_PRAYERS;
+}
+
+function formatMalayPrayerTime(hour, min) {
+    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+    const minPadded = String(min).padStart(2, "0");
+
+    let period = "malam";
+    if (hour >= 4 && hour < 12) period = "pagi";
+    else if (hour === 12) period = "tengah hari";
+    else if (hour >= 13 && hour < 19) period = "petang";
+
+    return `${hour12}:${minPadded} ${period}`;
+}
+
+// ============================================================================
+// 1. Multi-Timezone & Prayer Time Banner Formatter
+// ============================================================================
+
+async function getFormattedDateInfo() {
     const now = new Date();
+    const currentZoneCode = getSelectedZone();
+    const zoneDetails = JAKIM_ZONES[currentZoneCode] || JAKIM_ZONES[DEFAULT_ZONE];
 
     // 1. Malaysia Time (Current System Time / MYT)
-    // We will assume MYT is GMT+8 (Asia/Kuala_Lumpur)
     const myTimeFormat = new Intl.DateTimeFormat('ms-MY', {
         timeZone: 'Asia/Kuala_Lumpur',
         hour: 'numeric',
@@ -28,36 +219,34 @@ function getFormattedDateInfo() {
     const myDateStr = myDateFormat.format(now);
     const myTimeFullStr = myTimeFullFormat.format(now);
 
-    const myHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kuala_Lumpur', hour: 'numeric', hour12: false }).format(now));
+    const myHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kuala_Lumpur', hour: 'numeric', hour12: false }).format(now), 10);
+    const myMin = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kuala_Lumpur', minute: 'numeric' }).format(now), 10);
 
     let myGreeting = "malam 🌑";
     if (myHour >= 6 && myHour < 12) myGreeting = "pagi 🌅";
     else if (myHour >= 12 && myHour < 15) myGreeting = "tengah hari ☀️";
     else if (myHour >= 15 && myHour < 19) myGreeting = "petang 🌇";
 
-    // Mock prayer times (approximate for Penang)
-    const prayers = [
-        { name: "Subuh", hour: 6, min: 0 },
-        { name: "Zohor", hour: 13, min: 15 },
-        { name: "Asar", hour: 16, min: 30 },
-        { name: "Maghrib", hour: 19, min: 20 },
-        { name: "Isyak", hour: 20, min: 30 }
-    ];
+    // Live JAKIM Prayer Times for selected zone
+    const prayers = await getPrayerTimesForZone(currentZoneCode, now);
     let nextPrayer = prayers[0];
+    let isTomorrow = true;
+
     for (let i = 0; i < prayers.length; i++) {
-        const myMin = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kuala_Lumpur', minute: 'numeric' }).format(now));
         if (myHour < prayers[i].hour || (myHour === prayers[i].hour && myMin < prayers[i].min)) {
             nextPrayer = prayers[i];
+            isTomorrow = false;
             break;
         }
     }
-    const prayerTimeAmPm = nextPrayer.hour >= 12 ? (nextPrayer.hour > 12 ? nextPrayer.hour - 12 : 12) + ":" + nextPrayer.min.toString().padStart(2, '0') + " petang/malam" : nextPrayer.hour + ":" + nextPrayer.min.toString().padStart(2, '0') + " pagi";
 
-    // Clean up AM/PM translation from ms-MY locale format
+    const prayerTimeFormatted = formatMalayPrayerTime(nextPrayer.hour, nextPrayer.min);
+    const tomorrowSuffix = isTomorrow ? " (esok)" : "";
+
     const timeFormattedMy = myTimeFormat.format(now).replace('PG', '').replace('PTG', '').trim();
 
     const myMain = `sekarang sudah jam ${timeFormattedMy} ${myGreeting}`;
-    const mySubtitle = `${myDateStr} 🕐 ${myTimeFullStr} 🗺️ Kedah, Pulau Pinang, Kuala Lumpur, Singapura. Waktu solat di Penang berikutnya: ${nextPrayer.name} pada jam ${prayerTimeAmPm}`;
+    const mySubtitle = `${myDateStr} 🕐 ${myTimeFullStr} 🗺️ ${zoneDetails.name}. Waktu solat berikutnya: ${nextPrayer.name}${tomorrowSuffix} pada jam ${prayerTimeFormatted}`;
 
     // 2. Saudi Arabia Time
     const saudiTimeFormat = new Intl.DateTimeFormat('ar-SA', {
@@ -75,13 +264,13 @@ function getFormattedDateInfo() {
         year: 'numeric'
     });
 
-    const saudiHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Riyadh', hour: 'numeric', hour12: false }).format(now));
+    const saudiHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Riyadh', hour: 'numeric', hour12: false }).format(now), 10);
     let saudiGreeting = "مساءً 🌑";
     if (saudiHour >= 5 && saudiHour < 12) saudiGreeting = "صباحاً 🌅";
     else if (saudiHour >= 12 && saudiHour < 15) saudiGreeting = "ظهراً ☀️";
     else if (saudiHour >= 15 && saudiHour < 18) saudiGreeting = "عصراً 🌇";
 
-    const saudiMain = `الوقت الآن هو ${saudiTimeFormat.format(now)}`;
+    const saudiMain = `الوقت الآن هو ${saudiTimeFormat.format(now)} ${saudiGreeting}`;
     const saudiSubtitle = `${saudiHijriFormat.format(now)} 🕐 ${new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Riyadh', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'shortOffset', hour12: false }).format(now)} 🗺️ Riyadh, Mecca, Medina.`;
 
     // 3. Melbourne Time
@@ -99,10 +288,9 @@ function getFormattedDateInfo() {
         year: 'numeric'
     });
 
-    const melbHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', hour: 'numeric', hour12: false }).format(now));
+    const melbHour = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', hour: 'numeric', hour12: false }).format(now), 10);
+    const melbMin = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', minute: 'numeric' }).format(now), 10);
 
-    // Attempt to convert to "half past 5 getting dark"
-    const melbMin = parseInt(new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', minute: 'numeric' }).format(now));
     let melbTimeStr = melbTimeFormat.format(now);
     if (melbMin >= 25 && melbMin <= 35) melbTimeStr = `half past ${melbHour > 12 ? melbHour - 12 : melbHour}`;
 
@@ -112,7 +300,7 @@ function getFormattedDateInfo() {
     else if (melbHour >= 17 && melbHour < 19) melbGreeting = "getting dark 🌇";
 
     const melbTimeZoneName = new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Melbourne', timeZoneName: 'short' }).format(now).split(' ').pop();
-    const isDST = melbTimeZoneName === 'AEDT'; // Mock check for DST
+    const isDST = melbTimeZoneName === 'AEDT';
 
     const melbMain = `it's ${melbTimeStr} ${melbGreeting} when it's melbourne`;
     const melbSubtitle = `${melbDateFormat.format(now)} 🕐 ${new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now)} ${melbTimeZoneName} 🗺️ Melbourne, Victoria. ${isDST ? 'Currently observing Daylight Saving Time.' : 'Not in Daylight Saving Time.'}`;
@@ -127,7 +315,7 @@ function getFormattedDateInfo() {
     const melbShortDate = new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Melbourne', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
     const melbShortTime = new Intl.DateTimeFormat('en-US', { timeZone: 'Australia/Melbourne', hour: '2-digit', minute: '2-digit', hour12: true }).format(now).replace(' ', '');
 
-    const oneLiner = `${myShortDate} 🇲🇾 ${myShortTime} | ${saudiShortDate} 🇸🇦 ${saudiShortTime} | ${melbShortDate} 🇦🇺 ${melbShortTime} ${melbTimeZoneName} ☀️`;
+    const oneLiner = `${myShortDate} 🇲🇾 ${myShortTime} (${zoneDetails.name.split(' ')[0]}: ${nextPrayer.name} ${prayerTimeFormatted}) | ${saudiShortDate} 🇸🇦 ${saudiShortTime} | ${melbShortDate} 🇦🇺 ${melbShortTime} ${melbTimeZoneName} ☀️`;
 
     return [
         { main: myMain, sub: mySubtitle },
@@ -138,13 +326,11 @@ function getFormattedDateInfo() {
 }
 
 // ============================================================================
-// XOR Flag & Link Generator Logic
+// 2. XOR Flag & Link Generator Logic
 // ============================================================================
 
 function calculateXorFlag() {
     const now = new Date();
-
-    // 1. Current month has 31 days?
     const daysInMonth = new Date(
         now.getFullYear(),
         now.getMonth() + 1,
@@ -152,7 +338,6 @@ function calculateXorFlag() {
     ).getDate();
     const has31Days = daysInMonth === 31;
 
-    // 2. Melbourne DST status (consistent with getFormattedDateInfo + US/AU locales)
     const melbourneOffset = new Intl.DateTimeFormat("en-AU", {
         timeZone: "Australia/Melbourne",
         timeZoneName: "short"
@@ -176,7 +361,6 @@ function generateLink(timeHHMM, xorFlag) {
     const now = new Date();
     const systemHour = now.getHours();
 
-    // Saudi Arabia time (UTC+3)
     const saudiTime = new Intl.DateTimeFormat("en-GB", {
         timeZone: "Asia/Riyadh",
         hour: "2-digit",
@@ -189,7 +373,6 @@ function generateLink(timeHHMM, xorFlag) {
             ? saudiTime
             : timeHHMM;
 
-    // Returns only the partial Drive link as requested
     if (selectedTime && typeof xorFlag === "boolean") {
         return "file/d/1rwvqr1fF44gXUbg4wqJ9xg6s1PGVqewr/view?usp=drivesdk";
     }
@@ -209,7 +392,7 @@ function isTimeWithinTolerance(inputHHMM, targetHHMM, toleranceMinutes = 1) {
 }
 
 // ============================================================================
-// UI Injection, Two-Input Verification & Clipboard Actions
+// 3. UI Injection & Enterprise Portal Setup
 // ============================================================================
 
 function injectEnterpriseStyles() {
@@ -229,25 +412,33 @@ function injectEnterpriseStyles() {
             padding: 2px 12px;
             font-family: 'Lato', sans-serif;
         }
-        #tp-time-input {
-            width: 54px;
-            padding: 2px 5px;
+        #tp-zone-select,
+        #tp-time-input,
+        #tp-xor-toggle {
+            font-family: 'Lato', sans-serif;
             font-size: 11px;
-            text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.35);
             border-radius: 3px;
             background: rgba(0, 0, 0, 0.2);
             color: inherit;
             outline: none;
         }
+        #tp-zone-select {
+            padding: 2px 4px;
+            max-width: 130px;
+        }
+        #tp-zone-select option {
+            background: #0b2545;
+            color: #ffffff;
+        }
+        #tp-time-input {
+            width: 50px;
+            padding: 2px 4px;
+            text-align: center;
+        }
         #tp-xor-toggle {
             padding: 2px 6px;
-            font-size: 11px;
             font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 3px;
-            background: rgba(0, 0, 0, 0.2);
-            color: inherit;
             cursor: pointer;
         }
         #tp-unlock-btn {
@@ -395,7 +586,7 @@ async function copyTextToClipboard(value, label) {
 function setupEnterprisePortal() {
     injectEnterpriseStyles();
 
-    // 1. Add initial Google Drive anchor link to Footer (#socmed-platforms)
+    // 1. Add Google Drive anchor to Footer
     const socmedPlatforms = document.getElementById("socmed-platforms");
     if (socmedPlatforms && !document.getElementById("footer-gdrive-link")) {
         const driveAnchor = document.createElement("a");
@@ -409,21 +600,29 @@ function setupEnterprisePortal() {
         socmedPlatforms.appendChild(driveAnchor);
     }
 
-    // 2. Mount the Two-Input Gate into #navbar-first-row
+    // 2. Mount Gate + Location Selector into #navbar-first-row
     const navbarFirstRow = document.getElementById("navbar-first-row");
     const fixedNavbar = document.getElementById("fixed-navbar");
     if (!navbarFirstRow || !fixedNavbar) return;
 
+    const currentZone = getSelectedZone();
+    let zoneOptionsHtml = "";
+    for (const [code, info] of Object.entries(JAKIM_ZONES)) {
+        const selected = code === currentZone ? "selected" : "";
+        zoneOptionsHtml += `<option value="${code}" ${selected}>${info.name}</option>`;
+    }
+
     const gateContainer = document.createElement("div");
     gateContainer.id = "tp-unlock-gate";
     gateContainer.innerHTML = `
+        <select id="tp-zone-select" title="Select Malaysia Location / Zone">${zoneOptionsHtml}</select>
         <input type="text" id="tp-time-input" placeholder="hh:mm" maxlength="5" autocomplete="off" title="Input 1: Time (hh:mm)" />
         <button type="button" id="tp-xor-toggle" data-bool="" title="Input 2: Click to toggle XOR Flag (TRUE / FALSE)">XOR: ?</button>
         <button type="button" id="tp-unlock-btn">Verify</button>
     `;
     navbarFirstRow.appendChild(gateContainer);
 
-    // 3. Mount Hidden Navigation Menu inside #fixed-navbar
+    // 3. Mount Hidden Navigation Menu
     const hiddenMenu = document.createElement("div");
     hiddenMenu.id = "tp-hidden-menu";
     hiddenMenu.innerHTML = `
@@ -448,13 +647,19 @@ function setupEnterprisePortal() {
     `;
     fixedNavbar.appendChild(hiddenMenu);
 
-    // 4. Wire up Two-Input Gate Events
+    // 4. Wire up Events
+    const zoneSelect = document.getElementById("tp-zone-select");
     const timeInput = document.getElementById("tp-time-input");
     const xorToggle = document.getElementById("tp-xor-toggle");
     const unlockBtn = document.getElementById("tp-unlock-btn");
     let generatedDrivePartial = "";
 
-    // Auto-colon formatting when typing 4 digits (e.g. "1039" -> "10:39")
+    zoneSelect.addEventListener("change", (e) => {
+        setSelectedZone(e.target.value);
+        cachedPrayers = null; // force refresh
+        showPortalToast(`Location updated to ${JAKIM_ZONES[e.target.value].name}`);
+    });
+
     timeInput.addEventListener("input", (e) => {
         const clean = e.target.value.replace(/[^\d:]/g, "");
         if (/^\d{3,4}$/.test(clean)) {
@@ -462,7 +667,6 @@ function setupEnterprisePortal() {
         }
     });
 
-    // Cycle XOR button through TRUE -> FALSE
     xorToggle.addEventListener("click", () => {
         const current = xorToggle.getAttribute("data-bool");
         const next = current === "false" ? "true" : "false";
@@ -498,7 +702,6 @@ function setupEnterprisePortal() {
             hourCycle: "h23"
         }).format(now);
 
-        // Uses Saudi time when system hour is after 12:00 and before 24:00
         const useSaudiTime = systemHour > 12 && systemHour < 24;
         const timeValid = useSaudiTime
             ? isTimeWithinTolerance(rawTime, saudiHHMM)
@@ -520,7 +723,6 @@ function setupEnterprisePortal() {
         if (e.key === "Enter") verifyTwoInputs();
     });
 
-    // 5. Wire up Copy Buttons (Drive Partial Link & Emails)
     document.getElementById("tp-copy-drive-btn").addEventListener("click", () => {
         const linkPart =
             generatedDrivePartial ||
@@ -535,11 +737,10 @@ function setupEnterprisePortal() {
         });
     });
 
-    // 6. Wire up Password Assembler ("933>>" -> "LyKb933>RRjc")
     const passAssembler = document.getElementById("tp-pass-assembler");
     passAssembler.addEventListener("input", (e) => {
         if (e.target.value === "933>>") {
-            const finalPassword = `LyKb${e.target.value.slice(0, 4)}RRjc`; // LyKb933>RRjc
+            const finalPassword = `LyKb${e.target.value.slice(0, 4)}RRjc`;
             copyTextToClipboard(finalPassword, "LyKb933>RRjc");
             e.target.value = "";
             e.target.blur();
@@ -547,44 +748,46 @@ function setupEnterprisePortal() {
     });
 }
 
+// ============================================================================
+// 4. Async Hero Banner Loop
+// ============================================================================
+
 async function runTimeLoop() {
-    const displayDuration = 15000; // 15 seconds per message
+    const displayDuration = 15000;
     let typeItInstance = null;
 
     while (true) {
-        const messages = getFormattedDateInfo();
+        const messages = await getFormattedDateInfo();
 
         for (let i = 0; i < messages.length; i++) {
             const msg = messages[i];
 
-            // Destroy the old instance if it exists
             if (typeItInstance) {
                 typeItInstance.destroy();
                 typeItInstance = null;
             }
 
-            // Clear the existing text
-            document.querySelector("#message").innerHTML = "";
+            const msgEl = document.querySelector("#message");
+            if (msgEl) {
+                msgEl.innerHTML = "";
 
-            let htmlString = `<span>${msg.main}</span>`;
-            if (msg.sub) {
-                htmlString += `<br><span style="font-size: 0.6em; opacity: 0.8;">${msg.sub}</span>`;
+                let htmlString = `<span>${msg.main}</span>`;
+                if (msg.sub) {
+                    htmlString += `<br><span style="font-size: 0.6em; opacity: 0.8;">${msg.sub}</span>`;
+                }
+
+                typeItInstance = new TypeIt("#message", {
+                    speed: 30,
+                    waitUntilVisible: false,
+                })
+                .type(htmlString)
+                .go();
             }
 
-            // Start typing animation
-            typeItInstance = new TypeIt("#message", {
-                speed: 30, // Faster typing speed
-                waitUntilVisible: false,
-            })
-            .type(htmlString)
-            .go();
-
-            // Wait for 15 seconds before the next message
             await new Promise(resolve => setTimeout(resolve, displayDuration));
         }
     }
 }
 
-// Initialize the gate/menu and start the TypeIt loop when script loads
 setupEnterprisePortal();
 runTimeLoop();
