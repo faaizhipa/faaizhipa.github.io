@@ -629,19 +629,21 @@ function setupEnterprisePortal() {
         <div class="tp-menu-section">
             <span class="tp-section-label">Sites:</span>
             <a class="tp-portal-link" href="https://mytp.ontp.app/" target="_blank" rel="noopener noreferrer">TPPlatform</a>
-            <a class="tp-portal-link" href="https://www.seadc.ccms.teleperformance.com/" target="_blank" rel="noopener noreferrer" title="Where we do most of our acknowledgement">BMS (Seadc)</a>
-            <a class="tp-portal-link" href="https://teleperformance-mytp.sabacloud.com/" target="_blank" rel="noopener noreferrer" title="Log in via BMS / TPPlatform first for SSO">Learning At TP</a>
-            <a class="tp-portal-link" href="https://tp.onice.io/webmail/" target="_blank" rel="noopener noreferrer">IceWarp Webmail</a>
+            <a class="tp-portal-link" href="https://www.seadc.ccms.teleperformance.com/" target="_blank" rel="noopener noreferrer" title="Bahasa Melayu Selatan">BMS (Seadc)</a>
+            <a class="tp-portal-link" href="https://teleperformance-mytp.sabacloud.com/" target="_blank" rel="noopener noreferrer" title="Pastikan Bahasa Melayu Disambut Dahulu">Rakyat Tipi Digital</a>
+            <a class="tp-portal-link" href="https://tp.onice.io/webmail/" target="_blank" rel="noopener noreferrer">E-Mael</a>
         </div>
         <div class="tp-menu-section">
             <span class="tp-section-label">Copy:</span>
-            <button type="button" class="tp-copy-btn" id="tp-copy-drive-btn">Drive Partial Link</button>
-            <button type="button" class="tp-copy-btn" data-copy="shamsolnizam.5@apac.teleperformance.com">@apac Email</button>
-            <button type="button" class="tp-copy-btn" data-copy="amirfaaiz.shamsolnizam@fb.teleperformance-my.com">@fb Email</button>
-            <button type="button" class="tp-copy-btn" data-copy="faaiz@outlook.my">Meta Email</button>
+            <button type="button" class="tp-copy-btn" id="tp-copy-drive-btn">whirlpool</button>
+            <button type="button" class="tp-copy-btn" data-copy="shamsolnizam.5">apaxific</button>
+            <button type="button" class="tp-copy-btn" data-copy="@apac.teleperformance.com.au">apaxific au</button>
+            <button type="button" class="tp-copy-btn" data-copy="amirfaaiz.shamsolnizam">tipi-my</button>
+            <button type="button" class="tp-copy-btn" data-copy="faaiz@outlook">E-mael</button>
+            <button type="button" class="tp-copy-btn" data-copy="@fb.teleperformance-my.com.my">E-mael my</button>
         </div>
         <div class="tp-menu-section">
-            <span class="tp-section-label">ZScaler Key:</span>
+            <span class="tp-section-label">kunci xyz:</span>
             <input type="password" id="tp-pass-assembler" placeholder="Input token" autocomplete="off" />
         </div>
     `;
