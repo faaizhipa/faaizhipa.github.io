@@ -49,7 +49,9 @@ function init() {
 
 function animate() {
     requestAnimationFrame(animate);
-    canco.rotation.y += 0.0065;
+    if (canco) {
+        canco.rotation.y += 0.0065;
+    }
     renderer.render(scene, camera);
 };
 
