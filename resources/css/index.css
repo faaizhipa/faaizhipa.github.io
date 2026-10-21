@@ -63,13 +63,13 @@ html {
 #fixed-navbar {
   position: fixed;
   top: 0;
-  height: 3.8rem;
+  height: minmax(3.8rem, min-content);
   z-index: 100;
   box-shadow: 0 0.125rem 0.25rem hsla(0, 0%, 60%, 0.75);
 }
 
 #navbar-first-row {
-  display: none;
+  display: hidden;
 }
 
 #navbar-second-row {
