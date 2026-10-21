@@ -142,7 +142,7 @@ html {
     display: flex;
     flex-flow: column nowrap;
     justify-content: end;
-    height: 37.5%;
+    height: minmax(37.5%, min-content);
     width: 100vw;
     background: var(--celcom-gradient-1);
     padding: 0 .8rem;
