@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio & Shift Launchpad of Amir Faaiz Shamsolnizam — thoughtful digital systems, precise operations and human-centred experiences.">
+  <title>Amir Faaiz — Portfolio & Shift Launchpad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#0e172a;--paper:#f4f2ea;--blue:#2a62eb;--sky:#a8c6ff;--orange:#ff5b28;--green:#66ef9b;--line:rgba(14,23,42,.16);--mono:"DM Mono",monospace;--display:"Syne",sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:6rem}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);overflow-x:hidden;cursor:none}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}::selection{background:var(--orange);color:white}
+    .noise{position:fixed;inset:0;opacity:.045;pointer-events:none;z-index:90;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E")}
+    .cursor{position:fixed;width:16px;height:16px;border:1px solid var(--ink);border-radius:50%;pointer-events:none;z-index:99;transform:translate(-50%,-50%);transition:width .18s,height .18s,background .18s;mix-blend-mode:difference}.cursor.hot{width:52px;height:52px;background:white}
+    .topbar{position:fixed;z-index:80;top:0;left:0;right:0;height:78px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 3.5vw;border-bottom:1px solid rgba(255,255,255,.18);color:white;transition:background .35s,color .35s,border .35s}.topbar.scrolled{background:rgba(244,242,234,.88);backdrop-filter:blur(14px);color:var(--ink);border-color:var(--line)}
+    .brand{font-size:1.35rem;font-weight:800;letter-spacing:-.06em}.brand span{color:var(--orange)}nav{display:flex;gap:2rem;font:500 .72rem var(--mono);text-transform:uppercase;letter-spacing:.08em}nav a{position:relative}nav a:after{content:"";position:absolute;left:0;right:100%;bottom:-5px;height:1px;background:currentColor;transition:right .25s}nav a:hover:after{right:0}.availability{justify-self:end;font:400 .68rem var(--mono);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:.65rem}.availability span{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 0 5px rgba(102,239,155,.16);animation:pulse 2s infinite}
+    @keyframes pulse{50%{box-shadow:0 0 0 9px rgba(102,239,155,0)}}
+    
+    /* Launchpad Command Bar & Switcher */
+    .command-bar{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;margin-bottom:2.2rem;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:rgba(255,255,255,.04);backdrop-filter:blur(10px)}
+    .profile-switcher{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+    .profile-label{font:400 .65rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--sky);margin-right:.4rem}
+    .profile-btn{border:1px solid rgba(255,255,255,.25);background:transparent;color:white;padding:.55rem 1rem;border-radius:99px;font:500 .68rem var(--mono);text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:.22s;display:flex;align-items:center;gap:.45rem}
+    .profile-btn i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);display:inline-block}
+    .profile-btn.active{background:var(--orange);border-color:var(--orange);color:var(--ink);font-weight:600}
+    .profile-btn.active i{background:var(--ink)}
+    .profile-btn:hover:not(.active){border-color:var(--sky);color:var(--sky)}
+
+    .quick-actions{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+    .action-btn{border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.06);color:white;padding:.55rem .95rem;border-radius:10px;font:400 .65rem var(--mono);text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:.22s;display:inline-flex;align-items:center;gap:.45rem}
+    .action-btn:hover{background:white;color:var(--ink);border-color:white}
+    .action-btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+    .action-btn.primary:hover{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+    .action-btn.snap-ready{border-color:var(--green);color:var(--green)}
+    
+    /* Custom Profile Inline Editor */
+    .custom-drawer{display:none;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.14);width:100%}
+    .custom-drawer.open{display:grid}
+    .custom-field{display:grid;gap:.35rem}
+    .custom-field label{font:400 .58rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--sky)}
+    .custom-field input{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.22);border-radius:8px;padding:.55rem .75rem;color:white;font:300 .68rem var(--mono);outline:none}
+    .custom-field input:focus{border-color:var(--orange)}
+
+    /* Status Toast Bar */
+    .toast-bar{margin-bottom:1.6rem;padding:.75rem 1.1rem;border-radius:10px;background:rgba(102,239,155,.1);border:1px solid rgba(102,239,155,.35);color:var(--green);font:400 .68rem var(--mono);display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:42px}
+    .toast-bar span.hint{color:#b9c7e4;font-size:.62rem}
+
+    .hero{min-height:100svh;background:var(--ink);color:white;display:grid;align-items:end;position:relative;overflow:hidden;padding:clamp(8rem,15vw,12rem) 3.5vw 3vw}.hero-grid{position:absolute;inset:0;opacity:.14;background-image:linear-gradient(rgba(255,255,255,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.35) 1px,transparent 1px);background-size:8.333vw 8.333vw;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+    .orb{position:absolute;width:min(48vw,720px);aspect-ratio:1;border-radius:50%;right:-5vw;top:11vh;background:radial-gradient(circle at 30% 30%,#c8daff 0 4%,#3478ff 28%,#183fa4 55%,#09132a 72%);box-shadow:0 0 120px rgba(42,98,235,.35);animation:drift 9s ease-in-out infinite}.orb:after{content:"";position:absolute;inset:8%;border:1px solid rgba(255,255,255,.22);border-radius:50%}.orb-ring{position:absolute;width:min(56vw,830px);aspect-ratio:1;border:1px solid rgba(255,255,255,.22);border-radius:50%;right:-9vw;top:6vh;animation:spin 28s linear infinite}.orb-ring:before{content:"";position:absolute;width:12px;height:12px;background:var(--orange);border-radius:50%;left:13%;top:15%}@keyframes drift{50%{transform:translate(-2vw,2vh) scale(1.025)}}@keyframes spin{to{transform:rotate(360deg)}}
+    .hero-copy{position:relative;z-index:2;max-width:1200px}.eyebrow{display:flex;align-items:center;gap:1rem;font:400 .72rem var(--mono);text-transform:uppercase;letter-spacing:.14em;margin-bottom:1.8rem}.eyebrow:before{content:"";width:44px;height:1px;background:currentColor}.hero h1{font-size:clamp(4rem,10.7vw,10rem);line-height:.79;letter-spacing:-.075em;margin:0;text-transform:uppercase;max-width:9ch}.hero h1 span{display:block;color:transparent;-webkit-text-stroke:1.5px var(--sky);margin-left:13vw}.hero-bottom{display:grid;grid-template-columns:1fr 1fr;align-items:end;margin-top:3.2rem;border-top:1px solid rgba(255,255,255,.25);padding-top:1.4rem}.hero-bottom p{font:300 clamp(.8rem,1vw,1rem)/1.6 var(--mono);max-width:48ch;margin:0}.scroll-cue{justify-self:end;display:flex;gap:.7rem;align-items:center;font:400 .68rem var(--mono);text-transform:uppercase}.scroll-cue i{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(255,255,255,.35);border-radius:50%;font-style:normal;animation:bob 2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(6px)}}
+    .marquee{overflow:hidden;background:var(--orange);color:var(--ink);border-bottom:1px solid var(--ink);transform:rotate(-1deg) scale(1.02);position:relative;z-index:3}.marquee-track{display:flex;width:max-content;animation:marquee 22s linear infinite;padding:.8rem 0;font:600 1rem var(--mono);text-transform:uppercase}.marquee-track span{display:flex;align-items:center;gap:1.5rem;margin-right:1.5rem}.marquee-track span:after{content:"✦"}@keyframes marquee{to{transform:translateX(-50%)}}
+    .section{padding:clamp(5rem,10vw,10rem) 3.5vw}.section-tag{font:500 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:flex;gap:.8rem;align-items:center}.section-tag b{display:grid;place-items:center;width:30px;height:30px;border:1px solid currentColor;border-radius:50%;font-weight:400}.reveal{opacity:0;transform:translateY(45px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}.delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}
+    .about{display:grid;grid-template-columns:1fr 2.15fr;gap:8vw;align-items:start}.about-title{position:sticky;top:8rem}.about-title h2{font-size:clamp(2.4rem,4vw,5rem);line-height:.95;letter-spacing:-.06em;margin:2rem 0}.about-title p{font:300 .76rem/1.7 var(--mono);max-width:32ch;color:#42506a}.statement{font-size:clamp(2.2rem,4.8vw,5.4rem);line-height:1.03;letter-spacing:-.055em;margin:0}.statement em{font-style:normal;color:var(--blue)}.about-detail{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-top:6rem;padding-top:2rem;border-top:1px solid var(--line)}.about-detail p{font:300 .9rem/1.75 var(--mono);margin:0;color:#334059}.principles{list-style:none;padding:0;margin:0;counter-reset:principles}.principles li{counter-increment:principles;border-bottom:1px solid var(--line);padding:1rem 0;display:flex;justify-content:space-between;font-size:.95rem}.principles li:after{content:"0" counter(principles);font:400 .65rem var(--mono);color:var(--blue)}
+    .capabilities{background:var(--blue);color:white;padding:3.5vw;overflow:hidden}.cap-title{display:flex;justify-content:space-between;align-items:end;padding-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.3)}.cap-title h2{font-size:clamp(2.8rem,6vw,7rem);line-height:.85;letter-spacing:-.07em;margin:0}.cap-title p{font:300 .72rem/1.6 var(--mono);max-width:30ch;margin:0}.cap-grid{display:grid;grid-template-columns:repeat(4,1fr)}.cap{min-height:310px;padding:2rem 1.5rem;border-right:1px solid rgba(255,255,255,.28);position:relative;transition:background .35s,color .35s}.cap:last-child{border:0}.cap:hover{background:var(--paper);color:var(--ink)}.cap-num{font:400 .65rem var(--mono);opacity:.7}.cap h3{font-size:clamp(1.5rem,2vw,2.4rem);letter-spacing:-.04em;line-height:1;margin:8rem 0 1rem}.cap p{font:300 .72rem/1.6 var(--mono);max-width:30ch;margin:0;opacity:.8}.cap svg{position:absolute;right:1.4rem;top:1.5rem;width:36px;height:36px;transition:transform .35s}.cap:hover svg{transform:rotate(45deg)}
+    .work{background:#e7ebf3}.work-head{display:grid;grid-template-columns:1fr 2fr;gap:8vw;margin-bottom:5rem}.work-head h2{font-size:clamp(4rem,9vw,10rem);line-height:.8;letter-spacing:-.08em;text-transform:uppercase;margin:0}.work-head h2 span{color:transparent;-webkit-text-stroke:1.5px var(--ink)}.work-intro{align-self:end;font:300 .85rem/1.7 var(--mono);max-width:46ch}
+    .projects{border-top:1px solid var(--ink)}.project{position:relative;display:grid;grid-template-columns:90px 1.35fr .8fr 62px;align-items:center;gap:2rem;padding:2rem 0;border-bottom:1px solid var(--ink);transition:padding .3s,color .3s;overflow:hidden}.project:before{content:"";position:absolute;inset:0;background:var(--ink);transform:translateY(101%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}.project>*{position:relative;z-index:1}.project:hover{color:white;padding-left:1.2rem;padding-right:1.2rem}.project:hover:before{transform:none}.project-no{font:400 .7rem var(--mono)}.project h3{font-size:clamp(1.5rem,3vw,3.4rem);letter-spacing:-.05em;margin:0}.project-meta{font:300 .72rem/1.6 var(--mono)}.project-arrow{width:52px;height:52px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:1.3rem;transition:transform .3s}.project:hover .project-arrow{transform:rotate(-45deg);background:var(--orange);color:var(--ink);border-color:var(--orange)}.project-note{margin-top:1.4rem;font:300 .65rem var(--mono);opacity:.7}
+    .contact{background:var(--ink);color:white;min-height:86svh;position:relative;overflow:hidden}.contact:before{content:"";position:absolute;width:45vw;height:45vw;border:1px solid rgba(255,255,255,.13);border-radius:50%;right:-15vw;bottom:-23vw;box-shadow:0 0 0 7vw rgba(255,255,255,.025),0 0 0 14vw rgba(255,255,255,.02)}.contact-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.6fr 1fr;gap:8vw;align-items:end}.contact h2{font-size:clamp(4rem,9vw,10rem);line-height:.82;letter-spacing:-.08em;text-transform:uppercase;margin:2rem 0 3rem}.contact h2 span{display:block;color:var(--orange)}.contact-copy{font:300 .85rem/1.7 var(--mono);max-width:48ch}.contact-form{display:grid;gap:1.6rem}.field{display:grid;gap:.6rem}.field label{font:400 .62rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--sky)}.field input,.field textarea{border:0;border-bottom:1px solid rgba(255,255,255,.35);background:transparent;color:white;padding:.7rem 0;outline:0;border-radius:0}.field textarea{height:80px;resize:none}.field input:focus,.field textarea:focus{border-color:var(--orange)}.send{justify-self:start;border:0;background:var(--orange);color:var(--ink);padding:1rem 1.4rem;display:flex;align-items:center;gap:2.5rem;font:500 .7rem var(--mono);text-transform:uppercase;cursor:pointer;transition:transform .25s,background .25s}.send:hover{transform:translateY(-3px);background:white}.form-status{font:400 .7rem var(--mono);min-height:1rem;color:#72efa1}
+    .sites{background:#111b30;color:white;overflow:hidden}.sites-head{display:grid;grid-template-columns:1.5fr 1fr;align-items:end;gap:5vw;margin-bottom:2rem}.sites h2{font-size:clamp(3.5rem,8vw,9rem);line-height:.82;letter-spacing:-.075em;text-transform:uppercase;margin:2rem 0 0}.sites h2 span{display:block;color:transparent;-webkit-text-stroke:1px var(--sky)}.sites-intro{font:300 .78rem/1.7 var(--mono);max-width:48ch;color:#b9c7e4}.carousel-tools{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}.carousel-count{font:400 .65rem var(--mono);letter-spacing:.12em;color:var(--sky)}.carousel-nav{display:flex;gap:.6rem}.carousel-nav button{width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:transparent;color:white;cursor:pointer;transition:.25s}.carousel-nav button:hover{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+    .site-track{display:flex;gap:1.2rem;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 3.5vw 2rem;margin:0 -3.5vw}.site-track::-webkit-scrollbar{display:none}.site-card{flex:0 0 clamp(275px,24vw,350px);scroll-snap-align:start}.device{height:510px;border:1px solid rgba(255,255,255,.3);border-radius:24px;background:#eef2f7;padding:10px;box-shadow:0 24px 70px rgba(0,0,0,.24);transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}.site-card:hover .device{transform:translateY(-10px) rotate(.5deg);box-shadow:0 32px 90px rgba(0,0,0,.42)}.device-top{height:30px;display:flex;align-items:center;gap:5px;padding:0 5px}.device-top i{width:6px;height:6px;border-radius:50%;background:#c4cad5}.device-url{margin-left:7px;color:#677189;font:400 .52rem var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.screen{height:calc(100% - 30px);border-radius:15px;overflow:hidden;position:relative;color:#101a30;background:white}.screen-brand{height:58%;display:grid;place-items:center;text-align:center;padding:2rem;background:linear-gradient(145deg,#0e1a36,#285fdc);color:white}.screen-brand .mark{width:66px;height:66px;border:1px solid rgba(255,255,255,.55);border-radius:18px;display:grid;place-items:center;margin:auto auto 1.2rem;font-size:1.7rem;font-weight:700}.screen-brand h3{font-size:1.25rem;margin:0}.screen-brand p{font:300 .58rem/1.5 var(--mono);opacity:.8;margin-top:.35rem}.screen-panel{padding:1.4rem}.mock-line{height:8px;background:#dbe1ec;border-radius:10px;margin-bottom:10px}.mock-line.short{width:58%}.mock-button{height:32px;background:var(--blue);border-radius:6px;margin-top:1.1rem;display:grid;place-items:center;color:white;font:500 .55rem var(--mono);text-transform:uppercase;letter-spacing:.08em}.screen.learn .screen-brand{background:linear-gradient(145deg,#232852,#7558e8)}.screen.bms .screen-brand{background:linear-gradient(145deg,#0b3441,#11947f)}.screen.mail .screen-brand{background:linear-gradient(145deg,#2c193b,#dc6f3e)}.screen.meta .screen-brand{background:linear-gradient(145deg,#15265f,#277bf2)}
+    .site-info{padding:.95rem .3rem 0}.site-kicker{font:400 .58rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--sky)}.site-info h3{font-size:1rem;margin:.35rem 0 .8rem}.copy-email{width:100%;border:1px solid rgba(255,255,255,.25);background:transparent;color:white;padding:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;font:300 .6rem var(--mono);cursor:pointer;text-align:left;transition:.25s;border-radius:8px}.copy-email:hover,.copy-email.copied{border-color:var(--orange);background:rgba(255,91,40,.12)}.copy-email span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.copy-email b{color:var(--orange);text-transform:uppercase;font-weight:500;flex-shrink:0}
+    
+    /* Utility Toolbox & Vault */
+    .utility-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:2rem}
+    .utility-box{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.025);border-radius:14px;padding:1.2rem}
+    .utility-box h4{margin:0 0 .5rem;font:500 .72rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--sky)}
+    .utility-box p{margin:0 0 1rem;font:300 .65rem/1.6 var(--mono);color:#b9c7e4}
+    .utility-btns{display:flex;flex-wrap:wrap;gap:.5rem}
+
+    .code-vault{margin-top:1.2rem;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.025);border-radius:14px;overflow:hidden}.code-vault summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;cursor:pointer;font:400 .62rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#8fa3c9}.code-vault summary::-webkit-details-marker{display:none}.code-vault summary small{font:300 .55rem var(--mono);color:var(--orange)}.code-vault[open] summary{border-bottom:1px solid rgba(255,255,255,.12)}.code-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(255,255,255,.1)}.code-grid code{background:#111b30;color:#8fa3c9;padding:1.1rem;text-align:center;font:300 .72rem var(--mono);letter-spacing:.18em;cursor:pointer;transition:.2s}.code-grid code:hover{background:rgba(255,91,40,.15);color:white}
+    .site-card[role="link"]{cursor:pointer;border-radius:24px}.site-card[role="link"]:focus-visible{outline:2px solid var(--orange);outline-offset:8px}.site-card[role="link"] .site-info h3:after{content:" ↗";color:var(--orange);font-family:var(--mono);font-size:.75em}
+    footer{background:var(--ink);color:white;border-top:1px solid rgba(255,255,255,.2);padding:1.4rem 3.5vw;display:flex;justify-content:space-between;font:300 .62rem var(--mono);text-transform:uppercase;letter-spacing:.08em}
+    @media(max-width:900px){body{cursor:auto}.cursor{display:none}.topbar{grid-template-columns:auto 1fr;height:68px;padding:0 5vw}.topbar nav{display:none}.availability{font-size:0}.availability:after{content:"Available";font:400 .65rem var(--mono)}.hero{padding-left:5vw;padding-right:5vw}.hero h1 span{margin-left:0}.orb{width:76vw;right:-28vw;opacity:.72}.orb-ring{width:92vw;right:-35vw}.hero-bottom{grid-template-columns:1fr}.scroll-cue{display:none}.section{padding-left:5vw;padding-right:5vw}.about{grid-template-columns:1fr}.about-title{position:static}.about-title h2{margin-bottom:.7rem}.statement{font-size:clamp(2.4rem,8vw,4rem)}.about-detail{gap:2rem}.capabilities{padding:5vw}.cap-grid{grid-template-columns:1fr 1fr}.cap{border-bottom:1px solid rgba(255,255,255,.28);min-height:260px}.work-head{grid-template-columns:1fr}.project{grid-template-columns:52px 1fr 52px}.project-meta{display:none}.contact-inner{grid-template-columns:1fr}.contact-form{max-width:620px;margin-top:3rem}.sites-head{grid-template-columns:1fr}.site-track{padding-left:5vw;padding-right:5vw;margin-left:-5vw;margin-right:-5vw}.device{height:480px}.utility-grid,.custom-drawer.open{grid-template-columns:1fr}}
+    @media(max-width:560px){.hero h1{font-size:17vw}.hero-bottom p{font-size:.72rem}.about-detail{grid-template-columns:1fr}.cap-grid{grid-template-columns:1fr}.cap{min-height:220px;border-right:0}.cap h3{margin-top:5rem}.cap-title{display:block}.cap-title p{margin-top:1.5rem}.work-head h2{font-size:18vw}.project{gap:1rem}.project h3{font-size:1.35rem}.project-no{font-size:.6rem}.project-arrow{width:42px;height:42px}.contact h2{font-size:18vw}footer{display:block;line-height:1.8}.sites h2{font-size:17vw}.sites-intro{font-size:.7rem}.carousel-tools{margin-top:1.5rem}.site-card{flex-basis:82vw}.device{height:460px}.code-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Home">AF<span>.</span></a>
+    <nav aria-label="Primary navigation">
+      <a href="#sites">Launchpad</a><a href="#about">About</a><a href="#work">Work</a><a href="#contact">Contact</a>
+    </nav>
+    <a class="availability" href="#sites"><span></span> Shift Launchpad Active</a>
+  </header>
+
+  <main>
+    <section class="section sites" id="sites">
+      <div class="sites-head">
+        <div>
+          <div class="section-tag reveal in"><b>01</b> Shift Command &amp; Access Atlas</div>
+          <h2 class="reveal delay-1 in">Agent<br><span>Launchpad</span></h2>
+        </div>
+        <p class="sites-intro reveal delay-2 in">Select your agent profile (or use <code>?u=amir</code> / <code>?u=yoca</code> in the URL). Clicking any portal card automatically copies the corresponding email to your clipboard AND opens the pre-filled login portal.</p>
+      </div>
+
+      <!-- Profile Switcher & Instant Actions -->
+      <div class="command-bar reveal in">
+        <div class="profile-switcher" role="group" aria-label="Select Agent Profile">
+          <span class="profile-label">Agent Profile:</span>
+          <button type="button" class="profile-btn active" data-profile="amir"><i></i> Amir Faaiz</button>
+          <button type="button" class="profile-btn" data-profile="yoca"><i></i> Yoca Alfarizi</button>
+          <button type="button" class="profile-btn" data-profile="custom"><i></i> + Colleague</button>
+        </div>
+        <div class="quick-actions">
+          <button type="button" class="action-btn" id="connectScreenBtn" title="Connect screen once to enable Spacebar screenshots without SnippingTool.exe">1. Connect Screen Capture</button>
+          <button type="button" class="action-btn" id="snapClipBtn" title="Copy frame directly to clipboard (or press Spacebar)">2. Snap to Clipboard (Space)</button>
+          <button type="button" class="action-btn primary" id="openAllShiftBtn" title="Open all 4 core shift tabs and copy Google email">Launch All Shift Tabs ↗</button>
+        </div>
+
+        <!-- Colleague Customizer Drawer -->
+        <div class="custom-drawer" id="customDrawer">
+          <div class="custom-field">
+            <label for="custGoogle">Google (@support.fb.com)</label>
+            <input type="text" id="custGoogle" placeholder="username@support.fb.com">
+          </div>
+          <div class="custom-field">
+            <label for="custMs">Microsoft BMS (@apac.teleperformance.com)</label>
+            <input type="text" id="custMs" placeholder="lastname.1@apac.teleperformance.com">
+          </div>
+          <div class="custom-field">
+            <label for="custIce">IceWarp (@fb.teleperformance-my.com)</label>
+            <input type="text" id="custIce" placeholder="first.last@fb.teleperformance-my.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Feedback / Clipboard Status Bar -->
+      <div class="toast-bar reveal in" id="launchpadStatus" role="status">
+        <span id="statusMessage">Active Profile: Amir Faaiz — Click any card to auto-copy email &amp; open portal with login_hint.</span>
+        <span class="hint">Tip: Press <strong>Ctrl+V</strong> if a portal asks for your email a second time.</span>
+      </div>
+
+      <div class="carousel-tools reveal in">
+        <span class="carousel-count"><span id="siteIndex">01</span> / 05</span>
+        <div class="carousel-nav">
+          <button id="sitePrev" type="button" aria-label="Previous website">←</button>
+          <button id="siteNext" type="button" aria-label="Next website">→</button>
+        </div>
+      </div>
+
+      <div class="site-track" id="siteTrack" tabindex="0" aria-label="Website carousel">
+        <!-- Card 01: Google / FB Support Profile -->
+        <article class="site-card reveal in" role="link" tabindex="0" data-portal="google" data-url="" aria-label="Open FB Support Google Profile in a new tab">
+          <div class="device">
+            <div class="device-top"><i></i><i></i><i></i><span class="device-url">accounts.google.com</span></div>
+            <div class="screen">
+              <div class="screen-brand">
+                <div>
+                  <div class="mark">G</div>
+                  <h3>FB Support Profile</h3>
+                  <p>Google Workspace · Auto-Prefilled Email</p>
+                </div>
+              </div>
+              <div class="screen-panel">
+                <div class="mock-line short"></div>
+                <div class="mock-line"></div>
+                <div class="mock-button">Auto-Copy + Launch ↗</div>
+              </div>
+            </div>
+          </div>
+          <div class="site-info">
+            <span class="site-kicker">Portal 01 · Google</span>
+            <h3>TP / FB Support Profile</h3>
+            <button class="copy-email" type="button" data-email="">
+              <span class="email-label">shamsmuhammadam@support.fb.com</span>
+              <b>Copy</b>
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 02: Learning at TP (Microsoft / SabaCloud) -->
+        <article class="site-card reveal delay-1 in" role="link" tabindex="0" data-portal="learn" data-url="" aria-label="Open Learning at TP in a new tab">
+          <div class="device">
+            <div class="device-top"><i></i><i></i><i></i><span class="device-url">teleperformance-mytp.sabacloud.com</span></div>
+            <div class="screen learn">
+              <div class="screen-brand">
+                <div>
+                  <div class="mark">L</div>
+                  <h3>Learning at TP</h3>
+                  <p>SabaCloud · Microsoft APAC ID</p>
+                </div>
+              </div>
+              <div class="screen-panel">
+                <div class="mock-line short"></div>
+                <div class="mock-line"></div>
+                <div class="mock-button">Auto-Copy + Launch ↗</div>
+              </div>
+            </div>
+          </div>
+          <div class="site-info">
+            <span class="site-kicker">Portal 02 · Microsoft SSO</span>
+            <h3>Learning at TP</h3>
+            <button class="copy-email" type="button" data-email="">
+              <span class="email-label">shamsolnizam.5@apac.teleperformance.com</span>
+              <b>Copy</b>
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 03: BMS / SEADC (Microsoft) -->
+        <article class="site-card reveal delay-2 in" role="link" tabindex="0" data-portal="bms" data-url="" aria-label="Open BMS SEADC in a new tab">
+          <div class="device">
+            <div class="device-top"><i></i><i></i><i></i><span class="device-url">www.seadc.ccms.teleperformance.com</span></div>
+            <div class="screen bms">
+              <div class="screen-brand">
+                <div>
+                  <div class="mark">B</div>
+                  <h3>BMS / SEADC</h3>
+                  <p>Operations Acknowledgement · APAC ID</p>
+                </div>
+              </div>
+              <div class="screen-panel">
+                <div class="mock-line short"></div>
+                <div class="mock-line"></div>
+                <div class="mock-button">Auto-Copy + Launch ↗</div>
+              </div>
+            </div>
+          </div>
+          <div class="site-info">
+            <span class="site-kicker">Portal 03 · Microsoft BMS</span>
+            <h3>BMS / SEADC</h3>
+            <button class="copy-email" type="button" data-email="">
+              <span class="email-label">shamsolnizam.5@apac.teleperformance.com</span>
+              <b>Copy</b>
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 04: IceWarp Webmail -->
+        <article class="site-card reveal in" role="link" tabindex="0" data-portal="icewarp" data-url="" aria-label="Open IceWarp Webmail in a new tab">
+          <div class="device">
+            <div class="device-top"><i></i><i></i><i></i><span class="device-url">tp.onice.io/webmail</span></div>
+            <div class="screen mail">
+              <div class="screen-brand">
+                <div>
+                  <div class="mark">@</div>
+                  <h3>IceWarp</h3>
+                  <p>Teleperformance MY Webmail</p>
+                </div>
+              </div>
+              <div class="screen-panel">
+                <div class="mock-line short"></div>
+                <div class="mock-line"></div>
+                <div class="mock-button">Auto-Copy + Launch ↗</div>
+              </div>
+            </div>
+          </div>
+          <div class="site-info">
+            <span class="site-kicker">Portal 04 · Custom Domain</span>
+            <h3>IceWarp Webmail</h3>
+            <button class="copy-email" type="button" data-email="">
+              <span class="email-label">amirfaaiz.shamsolnizam@fb.teleperformance-my.com</span>
+              <b>Copy</b>
+            </button>
+          </div>
+        </article>
+
+        <!-- Card 05: Meta / Outlook -->
+        <article class="site-card reveal delay-1 in" role="link" tabindex="0" data-portal="meta" data-url="" aria-label="Open Meta Outlook in a new tab">
+          <div class="device">
+            <div class="device-top"><i></i><i></i><i></i><span class="device-url">outlook.my</span></div>
+            <div class="screen meta">
+              <div class="screen-brand">
+                <div>
+                  <div class="mark">M</div>
+                  <h3>Meta Enterprise</h3>
+                  <p>Enterprise Account Access</p>
+                </div>
+              </div>
+              <div class="screen-panel">
+                <div class="mock-line short"></div>
+                <div class="mock-line"></div>
+                <div class="mock-button">Auto-Copy + Launch ↗</div>
+              </div>
+            </div>
+          </div>
+          <div class="site-info">
+            <span class="site-kicker">Portal 05 · Workspace</span>
+            <h3>Meta / Outlook</h3>
+            <button class="copy-email" type="button" data-email="">
+              <span class="email-label">faaiz@outlook.my</span>
+              <b>Copy</b>
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Workstation Screenshot & URI Protocol Helpers -->
+      <div class="utility-grid reveal in">
+        <div class="utility-box">
+          <h4>Browser-Native Snipping Tool (Replaces Ctrl+N)</h4>
+          <p>Avoid accidentally opening a new Chrome tab with <code>Ctrl+N</code>. Click <strong>1. Connect Screen Capture</strong> above, select your screen, and press <strong>Spacebar</strong> anytime on this tab to copy a crisp screenshot straight to your Windows clipboard.</p>
+          <div class="utility-btns">
+            <a class="action-btn" href="ms-screenclip:">Test URI: ms-screenclip:</a>
+            <a class="action-btn" href="ms-snip:">Test URI: ms-snip:</a>
+            <button type="button" class="action-btn" id="dlSnipUrlBtn">Download SnippingTool .URL</button>
+          </div>
+        </div>
+        <div class="utility-box">
+          <h4>Quick Email Clipboard Matrix (<span id="matrixOwner">Amir</span>)</h4>
+          <p>Need to paste an email mid-session without opening a new tab? One-click copy for your three core identities:</p>
+          <div class="utility-btns">
+            <button type="button" class="action-btn quick-copy-pill" data-key="google">Copy Google Email</button>
+            <button type="button" class="action-btn quick-copy-pill" data-key="microsoft">Copy Microsoft (BMS)</button>
+            <button type="button" class="action-btn quick-copy-pill" data-key="icewarp">Copy IceWarp Email</button>
+          </div>
+        </div>
+      </div>
+
+      <details class="code-vault reveal in">
+        <summary><span>Reference sequence (Click any code to copy)</span><small>Tap to reveal</small></summary>
+        <div class="code-grid" aria-label="Incremented sample codes">
+          <code>3200</code><code>4837</code><code>4959</code><code>7073</code><code>8522</code><code>5482</code>
+        </div>
+      </details>
+
+      <!-- Hidden video/canvas for native browser screenshot capture -->
+      <video id="captureVideo" autoplay playsinline style="display:none"></video>
+      <canvas id="captureCanvas" style="display:none"></canvas>
+    </section>
+    
+    <section class="hero" id="home">
+      <div class="hero-grid" aria-hidden="true"></div><div class="orb" data-parallax=".12" aria-hidden="true"></div><div class="orb-ring" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <div class="eyebrow reveal in">Portfolio · Malaysia / Remote</div>
+        <h1 class="reveal delay-1 in">Amir <span>Faaiz</span></h1>
+        <div class="hero-bottom reveal delay-2 in">
+          <p>I bring calm structure to complex digital work—connecting people, processes and tools with clarity.</p>
+          <div class="scroll-cue">Scroll to explore <i>↓</i></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true"><div class="marquee-track">
+      <span>Digital operations</span><span>Human-centred systems</span><span>Clear communication</span><span>Reliable delivery</span><span>Digital operations</span><span>Human-centred systems</span><span>Clear communication</span><span>Reliable delivery</span>
+    </div></div>
+
+    <section class="section about" id="about">
+      <div class="about-title reveal in">
+        <div class="section-tag"><b>02</b> About</div>
+        <h2>Built for<br>the details.</h2>
+        <p>Thoughtful execution, dependable systems and a sharp eye for what makes work flow better.</p>
+      </div>
+      <div>
+        <p class="statement reveal in">I turn operational complexity into <em>clear, useful experiences</em> that people can trust.</p>
+        <div class="about-detail">
+          <p class="reveal delay-1 in">My work sits at the intersection of digital operations, support and experience. I care about the invisible details: the handoff that feels effortless, the documentation that answers the next question, and the system that keeps working under pressure.</p>
+          <ul class="principles reveal delay-2 in"><li>Clarity over noise</li><li>People before process</li><li>Consistency by design</li><li>Always learning</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="capabilities" aria-label="Capabilities">
+      <div class="cap-title reveal in"><h2>Ways I add value</h2><p>Practical strengths for teams building dependable digital experiences.</p></div>
+      <div class="cap-grid">
+        <article class="cap reveal in"><span class="cap-num">01 / 04</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19 19 5M8 5h11v11"></path></svg><h3>Digital<br>Operations</h3><p>Keeping workflows organised, visible and moving with fewer points of friction.</p></article>
+        <article class="cap reveal delay-1 in"><span class="cap-num">02 / 04</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19 19 5M8 5h11v11"></path></svg><h3>User<br>Support</h3><p>Solving issues clearly while making every interaction calm and human.</p></article>
+        <article class="cap reveal delay-2 in"><span class="cap-num">03 / 04</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19 19 5M8 5h11v11"></path></svg><h3>Knowledge<br>Systems</h3><p>Creating documentation and references people can actually find and use.</p></article>
+        <article class="cap reveal delay-3 in"><span class="cap-num">04 / 04</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 19 19 5M8 5h11v11"></path></svg><h3>Quality<br>Thinking</h3><p>Spotting patterns, tightening details and raising the standard of delivery.</p></article>
+      </div>
+    </section>
+
+    <section class="section work" id="work">
+      <div class="work-head">
+        <div><div class="section-tag reveal in"><b>03</b> Selected work</div><h2 class="reveal delay-1 in">Work<br><span>Files</span></h2></div>
+        <p class="work-intro reveal delay-2 in">A selection of representative concept work showing how I approach systems, support and operational clarity. Replace these with your live case studies when ready.</p>
+      </div>
+      <div class="projects">
+        <article class="project reveal in"><span class="project-no">001</span><h3>Onboarding Command Centre</h3><span class="project-meta">Workflow design · Documentation<br>Concept case study</span><span class="project-arrow">↗</span></article>
+        <article class="project reveal in"><span class="project-no">002</span><h3>Support Knowledge System</h3><span class="project-meta">Information architecture<br>Concept case study</span><span class="project-arrow">↗</span></article>
+        <article class="project reveal in"><span class="project-no">003</span><h3>Operations Health Dashboard</h3><span class="project-meta">Reporting · Quality signals<br>Concept case study</span><span class="project-arrow">↗</span></article>
+        <article class="project reveal in"><span class="project-no">004</span><h3>Service Handoff Playbook</h3><span class="project-meta">Process improvement<br>Concept case study</span><span class="project-arrow">↗</span></article>
+      </div>
+      <p class="project-note reveal in">Concept titles are intentionally presented as templates until verified project details are supplied.</p>
+    </section>
+    
+    <section class="section contact" id="contact">
+      <div class="contact-inner">
+        <div>
+          <div class="section-tag reveal in"><b>04</b> Contact</div>
+          <h2 class="reveal delay-1 in">Let’s build<br><span>better.</span></h2>
+          <p class="contact-copy reveal delay-2 in">Have a role, project or useful conversation in mind? Send a note. This demo keeps your message on-device and is ready to connect to your preferred form service.</p>
+        </div>
+        <form class="contact-form reveal delay-2 in" id="contactForm">
+          <div class="field"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required=""></div>
+          <div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" required=""></div>
+          <div class="field"><label for="message">A short message</label><textarea id="message" name="message" required=""></textarea></div>
+          <button class="send" type="submit">Send enquiry <span>↗</span></button><div class="form-status" id="formStatus" role="status"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>© <span id="year">2026</span> Amir Faaiz Shamsolnizam</span><span>Designed with intention · Built for motion</span></footer>
+
+  <script>
+    // 1. Agent Profiles Directory
+    const AGENT_PROFILES = {
+      amir: {
+        name: 'Amir Faaiz',
+        google: 'shamsmuhammadam@support.fb.com',
+        microsoft: 'shamsolnizam.5@apac.teleperformance.com',
+        icewarp: 'amirfaaiz.shamsolnizam@fb.teleperformance-my.com',
+        meta: 'faaiz@outlook.my'
+      },
+      yoca: {
+        name: 'Yoca Alfarizi',
+        google: 'alfaryoca@support.fb.com',
+        microsoft: 'alfarizi.6@apac.teleperformance.com',
+        icewarp: 'yoca.alfarizi@fb.teleperformance-my.com',
+        meta: 'alfaryoca@support.fb.com'
+      },
+      custom: {
+        name: 'Colleague Custom',
+        google: '',
+        microsoft: '',
+        icewarp: '',
+        meta: ''
+      }
+    };
+
+    let currentProfileKey = 'amir';
+
+    // Build Dynamic Pre-Fill Login URLs
+    function buildPortalUrl(portalType, profile) {
+      const gEmail = encodeURIComponent(profile.google || '');
+      const msEmail = encodeURIComponent(profile.microsoft || '');
+      const iceEmail = encodeURIComponent(profile.icewarp || '');
+
+      switch (portalType) {
+        case 'google':
+          return `https://accounts.google.com/AccountChooser?Email=${gEmail}&continue=https://www.google.com`;
+        case 'learn':
+          return `https://teleperformance-mytp.sabacloud.com/?login_hint=${msEmail}`;
+        case 'bms':
+          return `https://www.seadc.ccms.teleperformance.com/?login_hint=${msEmail}`;
+        case 'icewarp':
+          return `https://tp.onice.io/webmail/?username=${iceEmail}&email=${iceEmail}`;
+        case 'meta':
+          return `https://outlook.my/`;
+        default:
+          return 'https://www.google.com';
+      }
+    }
+
+    function getPortalEmail(portalType, profile) {
+      switch (portalType) {
+        case 'google': return profile.google;
+        case 'learn': return profile.microsoft;
+        case 'bms': return profile.microsoft;
+        case 'icewarp': return profile.icewarp;
+        case 'meta': return profile.meta || profile.google;
+        default: return profile.google;
+      }
+    }
+
+    const statusMessage = document.getElementById('statusMessage');
+    function setStatus(text) {
+      statusMessage.textContent = text;
+    }
+
+    async function copyText(value) {
+      if (!value) return;
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value);
+        return;
+      }
+      const helper = Object.assign(document.createElement('textarea'), { value });
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand('copy');
+      helper.remove();
+    }
+
+    function applyProfile(profileKey, updateUrl = true) {
+      if (!AGENT_PROFILES[profileKey]) profileKey = 'amir';
+      currentProfileKey = profileKey;
+      const profile = AGENT_PROFILES[profileKey];
+
+      // Toggle active button state
+      document.querySelectorAll('.profile-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.profile === profileKey);
+      });
+
+      // Toggle custom drawer
+      const drawer = document.getElementById('customDrawer');
+      drawer.classList.toggle('open', profileKey === 'custom');
+
+      // Update matrix owner name
+      document.getElementById('matrixOwner').textContent = profile.name;
+
+      // Update all 5 carousel cards dynamically
+      document.querySelectorAll('.site-card[data-portal]').forEach(card => {
+        const portal = card.dataset.portal;
+        const email = getPortalEmail(portal, profile) || 'Enter email above';
+        const targetUrl = buildPortalUrl(portal, profile);
+
+        card.dataset.url = targetUrl;
+        const copyBtn = card.querySelector('.copy-email');
+        const labelSpan = card.querySelector('.email-label');
+        if (copyBtn) copyBtn.dataset.email = email;
+        if (labelSpan) labelSpan.textContent = email;
+      });
+
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('u', profileKey);
+        window.history.replaceState({}, '', url);
+      }
+
+      setStatus(`Active Profile: ${profile.name} — Click any card to auto-copy its email & launch portal.`);
+    }
+
+    // Read URL query parameters on load (?u=yoca or ?u=amir)
+    const params = new URLSearchParams(window.location.search);
+    const initialUser = (params.get('u') || '').toLowerCase();
+    if (initialUser === 'yoca' || initialUser === 'alfaryoca') {
+      applyProfile('yoca', false);
+    } else if (initialUser === 'custom') {
+      AGENT_PROFILES.custom.google = params.get('g') || '';
+      AGENT_PROFILES.custom.microsoft = params.get('ms') || '';
+      AGENT_PROFILES.custom.icewarp = params.get('ice') || '';
+      document.getElementById('custGoogle').value = AGENT_PROFILES.custom.google;
+      document.getElementById('custMs').value = AGENT_PROFILES.custom.microsoft;
+      document.getElementById('custIce').value = AGENT_PROFILES.custom.icewarp;
+      applyProfile('custom', false);
+    } else {
+      applyProfile('amir', false);
+    }
+
+    // Profile Switcher Listeners
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyProfile(btn.dataset.profile));
+    });
+
+    // Custom Colleague Input Listeners
+    ['custGoogle', 'custMs', 'custIce'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        AGENT_PROFILES.custom.google = document.getElementById('custGoogle').value.trim();
+        AGENT_PROFILES.custom.microsoft = document.getElementById('custMs').value.trim();
+        AGENT_PROFILES.custom.icewarp = document.getElementById('custIce').value.trim();
+        AGENT_PROFILES.custom.meta = AGENT_PROFILES.custom.google;
+        applyProfile('custom', false);
+      });
+    });
+
+    // Quick Copy Matrix Pills
+    document.querySelectorAll('.quick-copy-pill').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const key = btn.dataset.key;
+        const email = AGENT_PROFILES[currentProfileKey][key];
+        if (!email) return setStatus('Please fill in the custom email field first.');
+        await copyText(email);
+        setStatus(`Copied ${email} to clipboard! Ready for Ctrl+V.`);
+      });
+    });
+
+    // Launch All Shift Tabs Button
+    document.getElementById('openAllShiftBtn').addEventListener('click', async () => {
+      const profile = AGENT_PROFILES[currentProfileKey];
+      if (profile.google) await copyText(profile.google);
+      setStatus(`Copied ${profile.google} & launching core shift portals... (Allow pop-ups if prompted)`);
+      const portals = ['google', 'learn', 'bms', 'icewarp'];
+      portals.forEach(p => {
+        window.open(buildPortalUrl(p, profile), '_blank', 'noopener,noreferrer');
+      });
+    });
+
+    // Code Vault Click-to-Copy
+    document.querySelectorAll('.code-grid code').forEach(codeEl => {
+      codeEl.addEventListener('click', async () => {
+        const val = codeEl.textContent.trim();
+        await copyText(val);
+        setStatus(`Copied reference code ${val} to clipboard!`);
+      });
+    });
+
+    // Native Browser Screen Capture (Replaces SnippingTool.exe Ctrl+N mistake)
+    const videoEl = document.getElementById('captureVideo');
+    const canvasEl = document.getElementById('captureCanvas');
+    const connectBtn = document.getElementById('connectScreenBtn');
+
+    async function startScreenStream() {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: { cursor: 'always' },
+          audio: false
+        });
+        videoEl.srcObject = stream;
+        connectBtn.classList.add('snap-ready');
+        connectBtn.textContent = 'Screen Connected ✓';
+        setStatus('Screen stream active! Press Spacebar or click "2. Snap to Clipboard" anytime.');
+        stream.getVideoTracks()[0].addEventListener('ended', () => {
+          connectBtn.classList.remove('snap-ready');
+          connectBtn.textContent = '1. Connect Screen Capture';
+          setStatus('Screen stream ended.');
+        });
+      } catch (err) {
+        setStatus('Screen capture cancelled or blocked: ' + err.message);
+      }
+    }
+
+    async function snapFrameToClipboard() {
+      if (!videoEl.srcObject) {
+        await startScreenStream();
+        return;
+      }
+      canvasEl.width = videoEl.videoWidth;
+      canvasEl.height = videoEl.videoHeight;
+      const ctx = canvasEl.getContext('2d');
+      ctx.drawImage(videoEl, 0, 0);
+      canvasEl.toBlob(async (blob) => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          setStatus(`Screenshot copied to clipboard at ${new Date().toLocaleTimeString()}! Press Ctrl+V anywhere.`);
+        } catch (err) {
+          setStatus('Clipboard write failed: ' + err.message);
+        }
+      }, 'image/png');
+    }
+
+    connectBtn.addEventListener('click', startScreenStream);
+    document.getElementById('snapClipBtn').addEventListener('click', snapFrameToClipboard);
+
+    // Spacebar Hotkey when on Launchpad tab (when not typing in an input)
+    window.addEventListener('keydown', (e) => {
+      const tag = document.activeElement ? document.activeElement.tagName : '';
+      if (e.code === 'Space' && tag !== 'INPUT' && tag !== 'TEXTAREA' && videoEl.srcObject) {
+        e.preventDefault();
+        snapFrameToClipboard();
+      }
+    });
+
+    // Download .URL Internet Shortcut to SnippingTool.exe
+    document.getElementById('dlSnipUrlBtn').addEventListener('click', () => {
+      const content = `[InternetShortcut]
+URL=file:///C:/Windows/System32/SnippingTool.exe
+IconFile=C:\Windows\System32\SnippingTool.exe
+IconIndex=0
+`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'SnippingTool_Shortcut.url';
+      a.click();
+      setStatus('Downloaded SnippingTool_Shortcut.url — test opening it from Ctrl+J Downloads.');
+    });
+
+    // Original Portfolio Animations & Interactions
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const topbar = document.querySelector('.topbar');
+    const cursor = document.querySelector('.cursor');
+    const reveals = document.querySelectorAll('.reveal');
+    const orb = document.querySelector('.orb');
+
+    if ('IntersectionObserver' in window && !reduced) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('in'); observer.unobserve(entry.target); }
+        });
+      }, { threshold: .14, rootMargin: '0px 0px -5% 0px' });
+      reveals.forEach(el => observer.observe(el));
+    } else { reveals.forEach(el => el.classList.add('in')); }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        topbar.classList.toggle('scrolled', window.scrollY > 80);
+        if (orb && !reduced) orb.style.translate = `0 ${window.scrollY * .08}px`;
+        ticking = false;
+      });
+    }
+    addEventListener('scroll', onScroll, { passive:true }); onScroll();
+
+    if (matchMedia('(pointer:fine)').matches) {
+      addEventListener('pointermove', e => { cursor.style.left = `${e.clientX}px`; cursor.style.top = `${e.clientY}px`; });
+      document.querySelectorAll('a,button,input,textarea,.project,.cap,.site-card,code').forEach(el => {
+        el.addEventListener('pointerenter', () => cursor.classList.add('hot'));
+        el.addEventListener('pointerleave', () => cursor.classList.remove('hot'));
+      });
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); }
+    }));
+
+    document.querySelectorAll('.project').forEach(project => project.addEventListener('click', () => {
+      const note = document.querySelector('.project-note');
+      note.textContent = 'Case-study links are ready to connect once verified project details are added.';
+    }));
+
+    const siteTrack = document.getElementById('siteTrack');
+    const siteCards = [...siteTrack.querySelectorAll('.site-card')];
+    const siteIndex = document.getElementById('siteIndex');
+    function activeSite() {
+      const nearest = siteCards.reduce((best, card, index) => {
+        const distance = Math.abs(card.offsetLeft - siteTrack.scrollLeft - siteTrack.offsetLeft);
+        return distance < best.distance ? { index, distance } : best;
+      }, { index:0, distance:Infinity });
+      siteIndex.textContent = String(nearest.index + 1).padStart(2, '0');
+      return nearest.index;
+    }
+    function moveSites(direction) {
+      const next = Math.max(0, Math.min(siteCards.length - 1, activeSite() + direction));
+      siteCards[next].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block:'nearest', inline:'start' });
+    }
+    document.getElementById('sitePrev').addEventListener('click', () => moveSites(-1));
+    document.getElementById('siteNext').addEventListener('click', () => moveSites(1));
+    siteTrack.addEventListener('scroll', activeSite, { passive:true });
+
+    // Enhanced Card Click: Auto-copies corresponding email before opening portal in new tab
+    async function openSite(card) {
+      const copyBtn = card.querySelector('.copy-email');
+      const email = copyBtn ? copyBtn.dataset.email : '';
+      if (email) {
+        try {
+          await copyText(email);
+          setStatus(`Copied ${email} to clipboard & opened portal! Press Ctrl+V if prompted.`);
+        } catch {}
+      }
+      const link = document.createElement('a');
+      link.href = card.dataset.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.click();
+    }
+
+    siteCards.forEach(card => {
+      card.addEventListener('click', event => { if (!event.target.closest('button')) openSite(card); });
+      card.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('button')) {
+          event.preventDefault(); openSite(card);
+        }
+      });
+    });
+
+    document.querySelectorAll('.copy-email').forEach(button => button.addEventListener('click', async () => {
+      const label = button.querySelector('b');
+      try {
+        await copyText(button.dataset.email);
+        label.textContent = 'Copied';
+        button.classList.add('copied');
+        setStatus(`Copied ${button.dataset.email} to clipboard!`);
+      } catch {
+        label.textContent = 'Try again';
+      }
+      setTimeout(() => { label.textContent = 'Copy'; button.classList.remove('copied'); }, 1800);
+    }));
+
+    document.getElementById('contactForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const status = document.getElementById('formStatus');
+      status.textContent = 'Message captured in this demo — connect a form endpoint to deliver it.';
+      e.target.reset();
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
